@@ -55,6 +55,11 @@
     (future (stream-to-out p :err))
     p))
 
+(defn stop
+  "Stops the server"
+  [p]
+  (destroy p))
+
 (defn mburl+
   [mb-port & [suffix]]
   (apply str "http://localhost:" mb-port suffix))
@@ -81,10 +86,12 @@
   "Create an imposter. Note, if you want an imposter on a random port,
    pass in port = nil."
   [mb-port port & [params]]
-  (http/post (mburl+ mb-port "/imposters")
-             {:as :json
-              :content-type "application/json"
-              :body (json/generate-string (create-imposter-data (assoc params :port port)))}))
+  (let [body (json/generate-string (create-imposter-data (assoc params :port port)))]
+    (println "BODY" body)
+    (http/post (mburl+ mb-port "/imposters")
+               {:as :json
+                :content-type "application/json"
+                :body body})))
 
 (defn get-imposter
   [mb-port port]
