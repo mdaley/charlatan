@@ -66,7 +66,7 @@
   [& [options]]
   (let [launch-delay (or (:delay options) 500)
         args (options->args (dissoc options :delay))
-        p (proc "mb" args)]
+        p (apply proc (cons "mb" args))]
     (future (stream-to-out p :out))
     (future (stream-to-out p :err))
     (Thread/sleep launch-delay) ;; A small delay so process gets going.
