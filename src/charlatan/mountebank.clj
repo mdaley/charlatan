@@ -64,7 +64,7 @@
 (defn start
   "Starts a mountebank server. If options are empty or not supplied mb is launched on the default port 2525."
   [& [options]]
-  (let [launch-delay (or (:delay options) 500)
+  (let [launch-delay (or (:delay options) 1000)
         args (options->args (dissoc options :delay))
         p (apply proc (cons "mb" args))]
     (future (stream-to-out p :out))
@@ -82,11 +82,13 @@
 (defmacro with-mb
   "Launches a mountebank instance and evaluates body in its context; at the end stops the mountebank process."
   [mb-opts & body]
-  `(binding [*mb* (start ~mb-opts)] (try ~@body (finally (stop *mb*)))))
+  `(binding [*mb* (start ~mb-opts)]
+     (try ~@body
+          (finally (stop *mb*)))))
 
 (defn mburl+
   "Build url for a mountebank request."
-  [mb-port & [suffix]]
+  [mb-port & suffix]
   (apply str "http://localhost:" mb-port suffix))
 
 (defn- mb-port
@@ -123,24 +125,26 @@
    (create-imposter (mb-port) port params))
   ([mb-port port params]
    (let [body (json/generate-string (create-imposter-data (assoc params :port port)))]
-     (println "BODY" body)
      (http/post (mburl+ mb-port "/imposters")
                 {:as :json
                  :content-type "application/json"
                  :body body}))))
-
-(defn get-imposter
-  ([port]
-   (get-imposter (mb-port) port))
-  ([mb-port port]
-   (http/get (mburl+ mb-port "/imposters/" port)
-             {:as :json})))
 
 (defn- replay-and-proxy-params
   [{:keys [replayable remove-proxies]}]
   (cond-> {}
     (not (nil? replayable)) (assoc :replayable replayable)
     (not (nil? remove-proxies)) (assoc :removeProxies remove-proxies)))
+
+(defn get-imposter
+  ([port]
+   (get-imposter port nil))
+  ([port params]
+   (get-imposter (mb-port) port params))
+  ([mb-port port params]
+   (http/get (mburl+ mb-port "/imposters/" port)
+             {:as :json
+              :query-params (replay-and-proxy-params params)})))
 
 (defn delete-imposter
   ([port]
