@@ -56,5 +56,4 @@
         (is (= status 202))
         (is (= body "pong")))
       (let [{status :status body :body} (mb/get-imposter port)]
-        (println status (-> body :stubs (first) :matches (first) :request :method))
         (is (= (-> body :stubs (first) :matches (first) :request :method) "GET"))))))
