@@ -17,9 +17,11 @@ using an acceptance testing mocking framework called [rest-driver](https://githu
 
 ## Usage
 
+Firstly, install Mountebank following the [instructions](http://www.mbtest.org/docs/gettingStarted) and maybe read through a bit of the documentation to familiarise yourself with how it works.
+
 Simply wrap a test or tests with the macro `with-mb` to launch a mountebank instance with the imposters and stubs required for that particular situation.
 
-Here's a very imple example where the healthcheck resource of your service under test makes a call to the ping resource of a remote service:
+Here's a very simple example where the healthcheck resource of your service under test makes a call to the ping resource of a remote service:
 
 ```clojure
 (ns test-namespace
