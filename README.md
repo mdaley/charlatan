@@ -37,7 +37,7 @@ Here's a very imple example where the healthcheck resource of your service under
                                                   {:throw-exceptions false})]
         (is (= status 200))
         (is (= body "Something useful that says remote service is broken"))))))
-```clojure
+```
 
 The service under test is running on port 8080. It is configured to call the remote service on port 8081. The imposter has been set up so that when `/ping` is called on port 8081, it responds with 500 internal server error. Mountebank itself is running on port 2525.
 
