@@ -45,7 +45,7 @@ For more complex situations, any number of imposters can be created running on d
 
 ## License
 
-Copyright © 2016 FIXME
+Copyright © 2016 Matthew Daley
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
