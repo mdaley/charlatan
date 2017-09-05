@@ -42,7 +42,7 @@
     (mb/with-mb {:port 2525}
       (let [{status :status body :body} (mb/get-config)]
         (is (= status 200))
-        (is (= (-> body :options :port) "2525"))))))
+        (is (= (-> body :options :port) 2525))))))
 
 (deftest get-imposter
   (testing "get imposter works"
@@ -53,19 +53,8 @@
                                                                 :path "/ping"}}]}]})
       (let [{status :status body :body} (http/get (str "http://localhost:" port "/ping")
                                                   {:throw-exceptions false})]
-        (is (= status 202))
+        (is (= status 200))
         (is (= body "pong")))
       (let [{status :status body :body} (mb/get-imposter port)
             match (-> body :stubs (first) :matches (first) :request)]
         (is (= (select-keys match [:method :path]) {:method "GET" :path "/ping"}))))))
-
-(deftest service-healthcheck
-  (testing "Healthcheck returns failure response when remote service ping fails"
-    (mb/with-mb {:port 2525 :debug true}
-      (mb/create-imposter 8081 {:stubs [{:responses [{:is {:statusCode 500}}]
-                                         :predicates [{:equals {:method "GET"
-                                                                :path "/ping"}}]}]})
-      (let [{status :status body :body} (http/get "http://localhost:8080/healthcheck"
-                                                  {:throw-exceptions false})]
-        (is (= status 200))
-        (is (= body "Something useful that says remote service is broken"))))))
